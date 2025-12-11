@@ -187,7 +187,7 @@ function App() {
     setTimeout(() => {
       const resultado = Math.floor(Math.random() * 20) + 1;
       setRolandoDado(false);
-      enviarMensagem(null, `(🎲 Rolei um d20 e tirei: ${resultado})`);
+      enviarMensagem(null, `🎲 Rolei um d20 e tirei: ${resultado}`);
     }, 1500);
   }
 

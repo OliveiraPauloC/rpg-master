@@ -17,35 +17,42 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body { 
+/* --- TRAVA DE TELA (ESTILO APP) --- */
+html, body {
   background-color: var(--bg-color); 
   color: var(--text-primary);
   font-family: 'Lato', sans-serif;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Impede rolagem da janela inteira */
+  position: fixed; /* Trava o corpo */
+  overscroll-behavior: none; /* Remove efeito elástico no iPhone */
 }
 
 .container { 
   width: 100%; 
   max-width: 900px;
-  height: 100vh; 
+  height: 100vh;      /* Fallback */
+  height: 100dvh;     /* Altura dinâmica real do mobile */
   display: flex;
   flex-direction: column;
   position: relative;
   background-image: radial-gradient(circle at top, #2d2d35 0%, var(--bg-color) 70%);
+  margin: 0 auto;     /* Centraliza no desktop */
+  overflow: hidden;   /* Garante que nada vaze */
 }
 
 /* --- MENU INICIAL ÉPICO --- */
 .menu-screen {
   padding: 40px;
-  /* Fundo de mesa de RPG genérico para o menu principal */
+  width: 100%;
+  height: 100%;
   background: rgba(255, 255, 255, 0.1), url('./assets/fundo.png') no-repeat center center/cover;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow-y: auto; 
 }
 
 .menu-screen h1 {
@@ -57,23 +64,23 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
+  text-align: center;
 }
 
-.title-icon {
-  filter: drop-shadow(0 0 10px var(--accent-color));
-}
+.title-icon { filter: drop-shadow(0 0 10px var(--accent-color)); }
 
 .grid-temas {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 50px;
+  gap: 30px;
   width: 100%;
   max-width: 800px;
+  padding-bottom: 20px;
 }
 
 /* Cartas de Tema */
 .btn-tema {
-  height: 180px; /* Um pouco mais altas para destacar a imagem */
+  height: 180px; 
   border-radius: 24px;
   border: 2px solid rgba(255, 255, 255, 0.1);
   color: white;
@@ -93,7 +100,6 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* Overlay escuro e texturizado */
 .btn-tema::before {
   content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7)); 
@@ -102,7 +108,6 @@ body {
 
 .btn-tema span, .btn-tema svg { position: relative; z-index: 1; text-shadow: 0 4px 15px rgba(0,0,0,1); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
 
-/* Hover Épico */
 .btn-tema:hover {
   transform: translateY(-12px) scale(1.02);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
@@ -110,24 +115,37 @@ body {
 }
 .btn-tema:hover::before { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
 
-.medieval { 
-  background-image: url('./assets/medieval.png'); 
-} 
+.medieval { background-image: url('./assets/medieval.png'); } 
+.cyberpunk { background-image: url('./assets/cyberpunk.png'); } 
+.terror { background-image: url('./assets/terror.png'); } 
+.espacial { background-image: url('./assets/espacial.png'); }
 
-.cyberpunk { 
-  background-image: url('./assets/cyberpunk.png'); 
-} 
-
-.terror { 
-  background-image: url('./assets/terror.png'); 
-} 
-
-.espacial { 
-  background-image: url('./assets/espacial.png'); 
+/* --- BOTÃO DE CRÉDITOS (Ajustado para ficar Épico) --- */
+.credits-btn {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  /* Visual Dourado e Premium */
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--gold); /* Borda Dourada */
+  color: var(--gold); /* Ícone Dourado */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: 0.3s;
+  z-index: 50;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); /* Brilho suave */
+}
+.credits-btn:hover {
+  background: var(--gold);
+  color: black;
+  transform: scale(1.1);
+  box-shadow: 0 0 25px var(--gold); /* Brilho forte */
 }
 
-
-/* --- HEADER E ÍCONES MAIORES --- */
+/* --- HEADER E ÍCONES --- */
 .chat-box { height: 100%; display: flex; flex-direction: column; }
 
 header { 
@@ -140,9 +158,8 @@ header h1 { font-family: 'Cinzel', serif; font-size: 1.8rem; color: var(--gold);
 
 .header-controls { display: flex; gap: 15px; }
 
-/* Ícones do Header Aumentados */
 .btn-header { 
-  width: 60px; height: 60px; /* Aumentado de 52px para 60px */
+  width: 60px; height: 60px; 
   border-radius: 18px; 
   border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -197,22 +214,13 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); backgrou
 .msg-controls { position: absolute; bottom: -35px; left: 10px; opacity: 0; transition: 0.3s; display: flex; gap: 10px; }
 .message:hover .msg-controls { opacity: 1; bottom: 5px; }
 
-/* CORREÇÃO DO ÍCONE DE ÁUDIO OVAL */
 .btn-falar-novamente { 
-  width: 40px; /* Largura fixa */
-  height: 40px; /* Altura fixa */
-  display: flex; align-items: center; justify-content: center;
-  background: var(--bot-msg-bg); 
-  border: 1px solid rgba(255,255,255,0.1); 
-  border-radius: 50%; /* Círculo perfeito */
-  color: var(--text-secondary); 
-  cursor: pointer; transition: 0.2s; 
-  padding: 0; /* Remove padding que pode distorcer */
-  flex-shrink: 0; /* Impede que seja esmagado */
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  background: var(--bot-msg-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-secondary); cursor: pointer; transition: 0.2s; padding: 0; flex-shrink: 0;
 }
 .btn-falar-novamente:hover { background: var(--accent-color); color: white; transform: scale(1.1); }
 
-/* Markdown e Input (Mantidos iguais, só para garantir o arquivo completo) */
+/* Markdown e Input */
 .markdown-content h1, .markdown-content h2 { color: var(--gold); font-family: 'Cinzel', serif; margin-top: 20px; border-bottom: 1px solid rgba(255, 215, 0, 0.2); padding-bottom: 8px; }
 .markdown-content strong { color: var(--accent-color); }
 .message.user .markdown-content strong { color: #ffd700; }
@@ -234,331 +242,166 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
 .pulsando { animation: pulseGreen 2s infinite; background-color: var(--success) !important; color: white !important; }
 @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(4, 211, 97, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(4, 211, 97, 0); } 100% { box-shadow: 0 0 0 0 rgba(4, 211, 97, 0); } }
 
-/* Botão de Música */
-.btn-header.music {
-  transition: all 0.3s ease;
-}
+.btn-header.music { transition: all 0.3s ease; }
+.btn-header.music.on { background: rgba(52, 152, 219, 0.2); color: #3498db; border-color: #3498db; }
+.btn-header.music.on:hover { background: #3498db; color: white; }
+.btn-header.music.off { background: rgba(255, 255, 255, 0.05); color: #555; border-color: #555; }
 
-/* Quando ligado: Cor Azul suave */
-.btn-header.music.on {
-  background: rgba(52, 152, 219, 0.2);
-  color: #3498db;
-  border-color: #3498db;
-}
-.btn-header.music.on:hover {
-  background: #3498db;
-  color: white;
-}
-
-/* Quando desligado: Cinza opaco */
-.btn-header.music.off {
-  background: rgba(255, 255, 255, 0.05);
-  color: #555;
-  border-color: #555;
-}
-
-/* --- PAINEL LATERAL (DRAWER) --- */
+/* --- PAINEL LATERAL (Estilo Base) --- */
 .inventory-panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 320px; /* Largura da gaveta */
-  height: 100%;
-  background: rgba(18, 18, 20, 0.98);
-  backdrop-filter: blur(15px);
+  position: absolute; /* Padrão desktop */
+  top: 0; right: 0; width: 320px; height: 100%;
+  background: rgba(18, 18, 20, 0.98); backdrop-filter: blur(15px);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 80px 25px 25px 25px; /* Topo alto para não bater no botão fechar */
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-  z-index: 150;
-  
-  /* Animação de Deslizar */
-  transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 80px 25px 25px 25px; display: flex; flex-direction: column; gap: 25px;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.8); z-index: 150;
+  transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-
-.inventory-panel.open {
-  transform: translateX(0); /* Entra na tela */
-}
-
-.inventory-header h2 {
-  font-family: 'Cinzel', serif;
-  color: var(--gold);
-  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-
-/* --- ATRIBUTOS (Barrinhas) --- */
-.stats-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.stat-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  font-weight: bold;
-}
+.inventory-panel.open { transform: translateX(0); }
+.inventory-header h2 { font-family: 'Cinzel', serif; color: var(--gold); border-bottom: 1px solid rgba(255, 215, 0, 0.3); padding-bottom: 10px; margin-bottom: 15px; }
+.stats-grid { display: flex; flex-direction: column; gap: 12px; }
+.stat-row { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); font-size: 0.9rem; font-weight: bold; }
 .stat-name { width: 40px; }
-.stat-bar-bg {
-  flex: 1;
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.stat-bar-fill {
-  height: 100%;
-  background: var(--accent-color);
-  border-radius: 4px;
-}
-
-/* Cores específicas para atributos */
-.str .stat-bar-fill { background: #e74c3c; } /* Força = Vermelho */
-.dex .stat-bar-fill { background: #2ecc71; } /* Destreza = Verde */
-.int .stat-bar-fill { background: #3498db; } /* Inteligência = Azul */
-
-/* --- LISTA DE ITENS --- */
-.items-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow-y: auto;
-}
-.item-card {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: 0.2s;
-}
-.item-card:hover {
-  border-color: var(--accent-color);
-  background: rgba(130, 87, 230, 0.1);
-}
+.stat-bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.stat-bar-fill { height: 100%; background: var(--accent-color); border-radius: 4px; }
+.str .stat-bar-fill { background: #e74c3c; }
+.dex .stat-bar-fill { background: #2ecc71; }
+.int .stat-bar-fill { background: #3498db; }
+.items-list { list-style: none; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.item-card { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+.item-card:hover { border-color: var(--accent-color); background: rgba(130, 87, 230, 0.1); }
 .item-icon { color: var(--gold); }
 .item-name { font-size: 0.95rem; color: var(--text-primary); }
 
-/* Ajuste Responsivo para não quebrar em celular */
-@media (max-width: 600px) {
-  .inventory-panel { width: 85%; }
-}
-
-/* =========================================
-   📱 MODO MOBILE (CELULAR) - TWEAKS FINAIS
-   ========================================= */
-
-/* 1. Correção da "Barra de Endereço Saltitante" */
-/* Usa dvh (Dynamic Viewport Height) para o site não ser engolido pela barra do navegador */
-body, .container {
-  height: 100vh; /* Fallback para navegadores antigos */
-  height: 100dvh; /* O segredo para celulares modernos */
-}
-
-/* Regras para telas menores que 768px (Tablets e Celulares) */
-@media (max-width: 768px) {
-
-  /* --- MENU PRINCIPAL EM UMA COLUNA --- */
-  .grid-temas {
-    grid-template-columns: 1fr; /* Um embaixo do outro */
-    gap: 15px;
-    max-width: 95%; /* Usa quase toda a largura */
-  }
-
-  .btn-tema {
-    height: 100px; /* Cartões mais baixos para caberem na tela */
-    font-size: 1.3rem; /* Fonte um pouco menor */
-  }
-
-  .menu-screen h1 {
-    font-size: 2rem; /* Título menor para não quebrar */
-    margin-bottom: 25px;
-  }
-
-  /* --- HEADER MAIS COMPACTO --- */
-  header {
-    padding: 10px 15px; /* Menos borda */
-  }
-
-  header h1 {
-    font-size: 1.1rem; /* Nome do app menor */
-  }
-
-  .btn-header {
-    width: 42px; /* Botões menores para caberem todos */
-    height: 42px;
-  }
-  
-  /* Esconde o título "RPG Master" se a tela for MUITO pequena (iPhone SE) */
-  @media (max-width: 380px) {
-    header h1 { display: none; }
-    header { justify-content: center; }
-  }
-
-  /* --- MENU DE CONFIGURAÇÃO CENTRALIZADO --- */
-  /* No celular, não cabe no canto direito. Vamos centralizar. */
-  .voz-selector {
-    width: 90%; /* Ocupa 90% da tela */
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%); /* Centraliza perfeitamente */
-    top: 70px;
-  }
-
-  /* --- CHAT E INPUT --- */
-  .message {
-    max-width: 90%; /* Balões ocupam mais espaço */
-    padding: 12px 16px;
-    font-size: 0.95rem;
-  }
-
-  .input-area {
-    padding: 10px;
-    gap: 8px;
-  }
-
-  /* Botões de ação (Dado, Mic, Enviar) um pouco menores */
-  .dice-btn, .mic-btn, .send-btn {
-    width: 48px;
-    height: 48px;
-  }
-
-  /* Ajuste crítico para iPhone: Fonte 16px evita zoom automático ao clicar */
-  input {
-    font-size: 16px; 
-    padding: 12px 15px;
-  }
-
-  /* --- PAINEL DE INVENTÁRIO (MOCHILA) --- */
-  .inventory-panel {
-    width: 85%; /* Gaveta ocupa quase toda a tela, mas deixa ver o fundo */
-    padding-top: 70px;
-  }
-}
-
-/* --- BOTÃO DE CRÉDITOS (MENU INICIAL) --- */
-.credits-btn {
-  position: absolute;
-  /* MUDANÇA: Movido para o canto inferior esquerdo */
-  bottom: 10px;
-  left: 30px;
-  /* -------------------------------------- */
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--text-primary);
-  /* MUDANÇA: Tamanho do botão aumentado */
-  width: 60px;
-  height: 60px;
-  /* -------------------------------------- */
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
-  z-index: 50;
-}
-.credits-btn:hover {
-  background: var(--gold);
-  color: black;
-  transform: scale(1.1);
-  box-shadow: 0 0 15px var(--gold);
-}
-
 /* --- MODAL DE CRÉDITOS --- */
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.85); /* Fundo escuro */
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s ease;
 }
-
 .credits-box {
-  background: #202024;
-  border: 2px solid var(--gold);
-  padding: 40px;
+  background: #202024; border: 2px solid var(--gold); padding: 40px;
+  border-radius: 24px; text-align: center; width: 90%; max-width: 400px;
+  position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  display: flex; flex-direction: column; align-items: center; gap: 15px;
+}
+.btn-close-modal { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; }
+.btn-close-modal:hover { color: white; }
+.credits-box h2 { font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 5px; }
+.dev-avatar { font-size: 4rem; margin: 10px 0; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+.credits-box h3 { color: white; font-size: 1.5rem; }
+.tech-stack { color: var(--accent-color); font-weight: bold; font-size: 0.9rem; margin-bottom: 15px; }
+.social-btn { display: flex; align-items: center; gap: 10px; background: #333; padding: 10px 20px; border-radius: 30px; color: white; text-decoration: none; transition: 0.3s; font-weight: bold; }
+.social-btn:hover { background: var(--accent-color); transform: translateY(-3px); }
+.version { margin-top: 20px; font-size: 0.8rem; color: var(--text-secondary); opacity: 0.5; }
+
+
+/* ==========================================================================
+   📱 MODO MOBILE - AJUSTES COMPLETOS
+   ========================================================================== */
+@media (max-width: 768px) {
+
+  button {
+    font-size: small;
+  }
+
+  /* --- MENU INICIAL --- */
+  .grid-temas { grid-template-columns: 1fr; gap: 15px; max-width: 95%; padding-bottom: 80px; }
+  .btn-tema { height: 110px; font-size: 1.3rem; }
+  .menu-screen h1 { font-size: 2rem; margin-bottom: 25px; }
+  .menu-screen { overflow-y: auto; }
+
+  /* --- BOTÃO DE CRÉDITOS (Mobile) --- */
+  .credits-btn {
+    bottom: 20px; left: 20px; width: 50px; height: 50px;
+  }
+  /* .credits-btn svg { width: 28px; height: 28px; } */
+
+  /* --- CABEÇALHO COMPACTO --- */
+  .chat-box header { padding: 8px 12px; height: 60px; flex-wrap: nowrap; }
+  .chat-box header h1 { font-size: 1.1rem; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .chat-box header h1 svg.mic-icon-header { width: 18px; height: 18px; }
+  
+  /* Esconde título em telas muito pequenas */
+  @media (max-width: 360px) { .chat-box header h1 { display: none; } }
+
+  .header-controls { gap: 4px; }
+  .btn-header { width: 38px; height: 38px; padding: 6px; }
+  .btn-header svg { width: 18px; height: 18px; }
+
+  /* --- ÁREA DE MENSAGENS --- */
+  .messages-area { padding: 10px; padding-bottom: 20px; }
+  .message { max-width: 92%; font-size: 0.95rem; padding: 12px 15px; margin-bottom: 10px; }
+  .btn-falar-novamente { width: 30px; height: 30px; }
+  .btn-falar-novamente svg { width: 16px; height: 16px; }
+
+  /* --- INPUT AREA (BOTÕES GRANDES AGORA) --- */
+  .input-area { padding: 8px 10px; gap: 6px; background: #202024; }
+  .input-area input { font-size: 16px; padding: 10px 15px; }
+  
+  /* AUMENTADOS PARA FACILITAR O TOQUE */
+  .dice-btn, .mic-btn, .send-btn { 
+    width: 50px; /* Aumentado de 42 para 50 */
+    height: 50px; 
+  }
+  .dice-btn svg, .mic-btn svg, .send-btn svg { 
+    width: 26px; /* Ícone aumentado de 20 para 26 */
+    height: 26px; 
+  }
+
+  /* --- INVENTÁRIO (FIXO PARA NÃO VAZAR) --- */
+  .inventory-panel {
+    position: fixed; /* TRAVA NA TELA */
+    top: 0; right: 0; width: 85%; height: 100dvh;
+    padding-top: 70px; z-index: 9999;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.8);
+    transform: translateX(120%);
+  }
+  .inventory-panel.open { transform: translateX(0); }
+
+  /* --- MENU VOZ --- */
+  .voz-selector {
+  position: fixed; /* Fixa na tela, ignora rolagem */
+  top: 600%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centraliza perfeitamente */
+  
+  background: rgba(32, 32, 36, 0.98);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--gold); /* Borda Dourada para destacar */
+  
+  padding: 30px;
   border-radius: 24px;
-  text-align: center;
-  width: 90%;
-  max-width: 400px;
-  position: relative;
-  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  box-shadow: 0 0 50px rgba(0,0,0,0.8); /* Sombra forte para separar do fundo */
+  z-index: 2000; /* Garante que fique ACIMA do chat e dos erros */
+  
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 15px;
+  gap: 20px;
+  
+  width: 90%; /* Ocupa largura boa no celular */
+  max-width: 350px; /* Não fica gigante no PC */
+  max-height: 90vh; /* Garante que cabe na altura */
+  overflow-y: auto; /* Rola se a tela for muito pequena */
+  
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.btn-close-modal {
-  position: absolute;
-  top: 15px; right: 15px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-.btn-close-modal:hover { color: white; }
-
-.credits-box h2 {
-  font-family: 'Cinzel', serif;
-  color: var(--gold);
-  margin-bottom: 5px;
+/* Animação de entrada suave */
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-.dev-avatar {
-  font-size: 4rem;
-  margin: 10px 0;
-  animation: float 3s ease-in-out infinite;
-}
-@keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
-
-.credits-box h3 {
-  color: white;
-  font-size: 1.5rem;
+/* Ajuste nos Sliders para ficarem mais bonitos no fundo escuro */
+.voz-selector input[type=range] {
+  background: rgba(255,255,255,0.1);
+  height: 8px;
 }
 
-.tech-stack {
-  color: var(--accent-color);
-  font-weight: bold;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
+.voz-selector input[type=range]::-webkit-slider-thumb {
+  background: var(--gold); /* Bolinha dourada */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
-
-.social-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #333;
-  padding: 10px 20px;
-  border-radius: 30px;
-  color: white;
-  text-decoration: none;
-  transition: 0.3s;
-  font-weight: bold;
-}
-.social-btn:hover {
-  background: var(--accent-color);
-  transform: translateY(-3px);
-}
-
-.version {
-  margin-top: 20px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  opacity: 0.5;
 }
