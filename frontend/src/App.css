@@ -146,7 +146,7 @@ html, body {
 }
 
 /* --- HEADER E ÍCONES --- */
-.chat-box { height: 100%; display: flex; flex-direction: column; }
+.chat-box { height: 97%; display: flex; flex-direction: column; }
 
 header { 
   padding: 25px;
@@ -524,4 +524,51 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
   .writing-panel.open {
     transform: translate(-50%, 0);
   }
+}
+
+/* --- ESTILOS DO MARKDOWN (CORRIGIDOS PARA NÃO FICAREM GIGANTES) --- */
+.markdown-content {
+  line-height: 1.6;
+}
+
+/* H1 agora tem tamanho de subtítulo (1.3rem) em vez de título gigante (2em) */
+.markdown-content h1 { 
+  color: var(--gold); 
+  font-family: 'Cinzel', serif; 
+  font-size: 1.3rem; /* Reduzido drásticamente */
+  margin-top: 15px; 
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2); 
+  padding-bottom: 5px; 
+}
+
+/* H2 um pouco menor que o H1 */
+.markdown-content h2 { 
+  color: var(--gold); 
+  font-family: 'Cinzel', serif; 
+  font-size: 1.15rem; 
+  margin-top: 12px; 
+  margin-bottom: 5px;
+}
+
+/* H3 para detalhes menores */
+.markdown-content h3 {
+  color: var(--accent-color);
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Negrito destacado */
+.markdown-content strong { 
+  color: var(--accent-color); 
+}
+.message.user .markdown-content strong { 
+  color: #ffd700; 
+}
+
+/* Listas mais compactas */
+.markdown-content ul, .markdown-content ol {
+  margin-left: 20px;
+  margin-bottom: 10px;
 }
