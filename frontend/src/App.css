@@ -408,3 +408,120 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
     overflow-y: auto;
   }
 }
+
+/* Container geral do rodapé */
+.input-container {
+  flex-shrink: 0;
+  background: #202024;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  position: relative;
+}
+
+/* --- BARRA DE AÇÃO FIXA (Rodapé) --- */
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  /* Garante altura segura no iPhone */
+  padding-bottom: max(15px, env(safe-area-inset-bottom)); 
+}
+
+/* Botões Redondos (Dado e Mic) */
+.dice-btn, .mic-btn {
+  width: 55px; height: 55px;
+  border-radius: 50%; border: none;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.dice-btn svg, .mic-btn svg { width: 28px; height: 28px; }
+
+/* Botão RESPONDER (O grandão) */
+.btn-responder {
+  flex: 1; /* Ocupa o resto do espaço */
+  height: 55px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 25px;
+  font-size: 1rem;
+  cursor: text; /* Cursor de texto para indicar input */
+  transition: 0.2s;
+}
+.btn-responder:active { background: rgba(255,255,255,0.2); transform: scale(0.98); }
+
+
+/* --- PAINEL DE ESCRITA (Slide Up) --- */
+.writing-panel {
+  position: fixed;
+  bottom: 0; left: 0; width: 100%;
+  height: 50vh; /* Ocupa metade da tela */
+  background: #18181b;
+  border-top: 2px solid var(--accent-color);
+  box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
+  border-radius: 20px 20px 0 0;
+  z-index: 2000; /* Acima de tudo */
+  display: flex; flex-direction: column;
+  padding: 20px;
+  
+  /* Animação de Deslizar */
+  transform: translateY(110%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.writing-panel.open {
+  transform: translateY(0);
+}
+
+.writing-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 15px; color: var(--gold); font-family: 'Cinzel', serif; font-size: 1.2rem;
+}
+
+.btn-close-writing {
+  background: transparent; border: none; color: #666; padding: 5px;
+}
+
+.writing-form {
+  flex: 1; display: flex; flex-direction: column; gap: 15px;
+}
+
+.writing-form textarea {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  font-size: 1.1rem;
+  resize: none; /* Tira o puxador de tamanho */
+  font-family: 'Lato', sans-serif;
+}
+.writing-form textarea:focus { outline: none; border-color: var(--accent-color); }
+
+.send-btn-large {
+  width: 100%; height: 55px;
+  background: var(--success);
+  border: none; border-radius: 12px;
+  color: white; font-weight: bold; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; box-shadow: 0 5px 15px rgba(4, 211, 97, 0.3);
+}
+.send-btn-large:active { transform: scale(0.98); }
+
+/* Ajuste Desktop: Se a tela for grande, o painel fica menor e centralizado */
+@media (min-width: 769px) {
+  .writing-panel {
+    width: 600px;
+    left: 50%;
+    transform: translate(-50%, 110%); /* Centralizado horizontalmente */
+    height: 300px;
+  }
+  .writing-panel.open {
+    transform: translate(-50%, 0);
+  }
+}

@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import { useState, useEffect, useRef } from 'react'
-import { Mic, MicOff, Send, Volume2, Loader2, RotateCcw, Sword, Zap, Ghost, Rocket, Dices, FastForward, Square, Settings, X, Music, Backpack, Info, Github } from 'lucide-react'
+import { Mic, MicOff, Send, Volume2, Loader2, RotateCcw, Sword, Zap, Ghost, Rocket, Dices, FastForward, Square, Settings, X, Music, Backpack, Info, Github, Keyboard, ChevronDown } from 'lucide-react'
 import axios from 'axios'
 import './App.css'
 
@@ -43,6 +43,8 @@ function App() {
   });
 
   const [mostrarCreditos, setMostrarCreditos] = useState(false);
+
+  const [digitando, setDigitando] = useState(false);
 
   const MUSICAS = {
     medieval: musMedieval,
@@ -405,12 +407,42 @@ function App() {
           {loading && <div className="message bot loading-msg"><Loader2 className="spin" size={20}/> Criando situações...</div>}
           <div ref={messagesEndRef} />
         </div>
-        <form onSubmit={enviarMensagem} className="input-area">
-          <button type="button" className={`dice-btn ${rolandoDado ? 'rolling' : ''}`} onClick={rolarDado} disabled={loading || rolandoDado || podeContinuar}><Dices size={24}/></button>
-          <button type="button" className={`mic-btn ${ouvindo ? 'ouvindo' : ''}`} onClick={ligarMicrofone} disabled={loading || podeContinuar}>{ouvindo ? <MicOff /> : <Mic />}</button>
-          <input type="text" value={texto} onChange={(e) => setTexto(e.target.value)} placeholder={podeContinuar ? "Fim." : "Sua ação..."} disabled={loading || podeContinuar} />
-          <button type="submit" className="send-btn" disabled={loading || !texto.trim() || podeContinuar}><Send /></button>
-        </form>
+        <div className="input-container">
+          
+          {/* PAINEL DE DIGITAÇÃO (Sobe quando clica em Responder) */}
+          <div className={`writing-panel ${digitando ? 'open' : ''}`}>
+            <div className="writing-header">
+              <span>Sua Ação</span>
+              <button onClick={() => setDigitando(false)} className="btn-close-writing"><ChevronDown size={24}/></button>
+            </div>
+            <form onSubmit={(e) => { setDigitando(false); enviarMensagem(e); }} className="writing-form">
+              <textarea 
+                value={texto} 
+                onChange={(e) => setTexto(e.target.value)} 
+                placeholder="Descreva detalhadamente o que você vai fazer..." 
+                autoFocus={digitando}
+              />
+              <button type="submit" className="send-btn-large">
+                ENVIAR AÇÃO <Send size={20}/>
+              </button>
+            </form>
+          </div>
+
+          <div className="action-bar">
+            <button type="button" className={`dice-btn ${rolandoDado ? 'rolling' : ''}`} onClick={rolarDado} disabled={loading || rolandoDado || podeContinuar}>
+              <Dices size={28}/>
+            </button>
+            
+            <button type="button" className={`mic-btn ${ouvindo ? 'ouvindo' : ''}`} onClick={ligarMicrofone} disabled={loading || podeContinuar}>
+              {ouvindo ? <MicOff size={28}/> : <Mic size={28}/>}
+            </button>
+
+            <button type="button" className="btn-responder" onClick={() => setDigitando(true)} disabled={loading || podeContinuar}>
+              <span>Responder...</span>
+              <Keyboard size={24}/>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
