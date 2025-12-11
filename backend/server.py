@@ -28,10 +28,10 @@ generation_config = {
 # --- LISTA DE MODELOS OTIMIZADA ---
 # Priorizamos o 1.5 Flash (Estável) pois tem maior cota que o 2.0 (Preview)
 MODELOS_PARA_TENTAR = [
-    'gemini-1.5-flash',          # O mais robusto para produção
-    'gemini-1.5-flash-latest',   # Alternativa
-    'gemini-2.0-flash-lite',     # Rápido, mas cota menor
-    'gemini-pro',                # Antigo mas confiável
+    'gemini-flash-latest',       # Aponta para o 1.5 Flash (Estável)
+    'gemini-2.0-flash-lite',     # Rápido (Se der cota, pula)
+    'gemini-2.0-flash',          # Potente
+    'gemini-pro-latest'          # Fallback antigo
 ]
 
 historico_por_ip = {} # Memória simples (O ideal seria banco de dados)
