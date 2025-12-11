@@ -120,7 +120,7 @@ html, body {
 .terror { background-image: url('./assets/terror.png'); } 
 .espacial { background-image: url('./assets/espacial.png'); }
 
-/* --- BOTÃO DE CRÉDITOS (Ajustado para ficar Épico) --- */
+/* --- BOTÃO DE CRÉDITOS (GLOBAL - ESTILO DOURADO) --- */
 .credits-btn {
   position: absolute;
   bottom: 30px;
@@ -174,17 +174,39 @@ header h1 { font-family: 'Cinzel', serif; font-size: 1.8rem; color: var(--gold);
 .btn-header.continue:hover { background: var(--success); color: white; }
 
 
-/* --- MENU DE VOZ --- */
+/* --- MENU DE VOZ (GLOBAL - CENTRALIZADO) --- */
+/* Definido globalmente como fixed para evitar cortes no desktop também */
 .voz-selector {
-  position: absolute; top: 95px; right: 25px;
-  background: rgba(32, 32, 36, 0.98); backdrop-filter: blur(15px);
-  padding: 25px; border-radius: 24px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 100;
-  display: flex; flex-direction: column; gap: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.1); width: 320px; color: var(--text-primary);
-  animation: slideIn 0.3s ease;
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centraliza perfeitamente */
+  
+  background: rgba(32, 32, 36, 0.98);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--gold); /* Borda Dourada */
+  
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  z-index: 2000; /* Acima de tudo */
+  
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  
+  width: 350px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
 
 .config-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 .config-header h3 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.3rem; }
@@ -194,8 +216,8 @@ header h1 { font-family: 'Cinzel', serif; font-size: 1.8rem; color: var(--gold);
 .slider-group { display: flex; flex-direction: column; gap: 12px; }
 .slider-group label { font-weight: 700; color: var(--text-primary); display: flex; justify-content: space-between; font-size: 0.9rem; }
 input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; outline: none; border: none; padding: 0; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--accent-color); border: 3px solid var(--chat-bg); border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px rgba(130, 87, 230, 0.6); transition: 0.2s; }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); background: var(--accent-hover); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--gold); border: 2px solid #202024; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); transition: 0.2s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .btn-teste { background: linear-gradient(135deg, var(--accent-color), #6b46c1); color: white; padding: 14px; border-radius: 16px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; box-shadow: 0 5px 20px rgba(130, 87, 230, 0.4); }
 .btn-teste:hover { filter: brightness(1.1); transform: translateY(-3px); }
 
@@ -247,9 +269,9 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
 .btn-header.music.on:hover { background: #3498db; color: white; }
 .btn-header.music.off { background: rgba(255, 255, 255, 0.05); color: #555; border-color: #555; }
 
-/* --- PAINEL LATERAL (Estilo Base) --- */
+/* --- PAINEL LATERAL (DRAWER) --- */
 .inventory-panel {
-  position: absolute; /* Padrão desktop */
+  position: absolute;
   top: 0; right: 0; width: 320px; height: 100%;
   background: rgba(18, 18, 20, 0.98); backdrop-filter: blur(15px);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
@@ -298,13 +320,12 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
 
 
 /* ==========================================================================
-   📱 MODO MOBILE - AJUSTES COMPLETOS
+   📱 MODO MOBILE (CELULAR) - TWEAKS FINAIS
    ========================================================================== */
 @media (max-width: 768px) {
 
-  button {
-    font-size: small;
-  }
+  /* Ajuste no Texto */
+  button { font-size: small; }
 
   /* --- MENU INICIAL --- */
   .grid-temas { grid-template-columns: 1fr; gap: 15px; max-width: 95%; padding-bottom: 80px; }
@@ -316,14 +337,14 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
   .credits-btn {
     bottom: 20px; left: 20px; width: 50px; height: 50px;
   }
-  /* .credits-btn svg { width: 28px; height: 28px; } */
-
+  
   /* --- CABEÇALHO COMPACTO --- */
   .chat-box header { padding: 8px 12px; height: 60px; flex-wrap: nowrap; }
-  .chat-box header h1 { font-size: 1.1rem; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  /* Título menor para não espremer os botões */
+  .chat-box header h1 { font-size: 1rem; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
   .chat-box header h1 svg.mic-icon-header { width: 18px; height: 18px; }
   
-  /* Esconde título em telas muito pequenas */
+  /* Esconde título se tela for minúscula */
   @media (max-width: 360px) { .chat-box header h1 { display: none; } }
 
   .header-controls { gap: 4px; }
@@ -340,19 +361,20 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
   .input-area { padding: 8px 10px; gap: 6px; background: #202024; }
   .input-area input { font-size: 16px; padding: 10px 15px; }
   
-  /* AUMENTADOS PARA FACILITAR O TOQUE */
+  /* AUMENTADOS PARA FACILITAR O TOQUE (50px) */
   .dice-btn, .mic-btn, .send-btn { 
-    width: 50px; /* Aumentado de 42 para 50 */
+    width: 50px; 
     height: 50px; 
   }
+  /* ÍCONES INTERNOS AUMENTADOS */
   .dice-btn svg, .mic-btn svg, .send-btn svg { 
-    width: 26px; /* Ícone aumentado de 20 para 26 */
+    width: 26px; 
     height: 26px; 
   }
 
   /* --- INVENTÁRIO (FIXO PARA NÃO VAZAR) --- */
   .inventory-panel {
-    position: fixed; /* TRAVA NA TELA */
+    position: fixed; 
     top: 0; right: 0; width: 85%; height: 100dvh;
     padding-top: 70px; z-index: 9999;
     box-shadow: -5px 0 20px rgba(0,0,0,0.8);
@@ -360,48 +382,29 @@ input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(130,
   }
   .inventory-panel.open { transform: translateX(0); }
 
-  /* --- MENU VOZ --- */
+  /* --- MENU VOZ (MODAL CENTRALIZADO) --- */
   .voz-selector {
-  position: fixed; /* Fixa na tela, ignora rolagem */
-  top: 600%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* Centraliza perfeitamente */
-  
-  background: rgba(32, 32, 36, 0.98);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--gold); /* Borda Dourada para destacar */
-  
-  padding: 30px;
-  border-radius: 24px;
-  box-shadow: 0 0 50px rgba(0,0,0,0.8); /* Sombra forte para separar do fundo */
-  z-index: 2000; /* Garante que fique ACIMA do chat e dos erros */
-  
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  
-  width: 90%; /* Ocupa largura boa no celular */
-  max-width: 350px; /* Não fica gigante no PC */
-  max-height: 90vh; /* Garante que cabe na altura */
-  overflow-y: auto; /* Rola se a tela for muito pequena */
-  
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Animação de entrada suave */
-@keyframes popIn {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-
-/* Ajuste nos Sliders para ficarem mais bonitos no fundo escuro */
-.voz-selector input[type=range] {
-  background: rgba(255,255,255,0.1);
-  height: 8px;
-}
-
-.voz-selector input[type=range]::-webkit-slider-thumb {
-  background: var(--gold); /* Bolinha dourada */
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
+    position: fixed; 
+    top: 600%; /* Corrigido de 600% para 50% */
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    
+    background: rgba(32, 32, 36, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--gold);
+    
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    z-index: 2000;
+    
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+    width: 90%; 
+    max-width: 350px;
+    max-height: 80vh; 
+    overflow-y: auto;
+  }
 }
