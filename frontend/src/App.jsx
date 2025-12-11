@@ -11,8 +11,7 @@ import musCyberpunk from './assets/cyberpunk.mp3'
 import musTerror from './assets/terror.mp3'
 import musEspacial from './assets/espacial.mp3'
 
-// ⚠️ SEU LINK DA PORTA 5000 AQUI
-const API_URL = "https://scaling-spoon-9x9969jpvw2pw9x-5000.app.github.dev"; 
+const API_URL = "https://rpg-master-32ct.onrender.com"; 
 
 function App() {
   const [texto, setTexto] = useState('')
