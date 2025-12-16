@@ -63,6 +63,13 @@ FORMATO:
 - Termine SEMPRE com "O que você faz?" ou pedindo rolagem.
 """
 
+PROMPT_MESTRE_BASE = f"""
+{ESTRUTURA_NARRATIVA}
+TÉCNICA:
+- Use **Negrito** para inimigos e CDs (ex: **CD 15**).
+- Use *Itálico* para sons.
+"""
+
 TEMAS = {
     "medieval": f"{PROMPT_MESTRE_BASE} CENÁRIO: Alta Fantasia (D&D). Espadas, Magia, Dragões, Masmorras.",
     "cyberpunk": f"{PROMPT_MESTRE_BASE} CENÁRIO: Cyberpunk Distópico. Neon, Implantes, Hackers, Megacorporações.",
