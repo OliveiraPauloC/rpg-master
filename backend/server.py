@@ -30,37 +30,33 @@ MODELOS_PARA_TENTAR = [
 
 # --- PROMPT DO MESTRE (MANTÉM AS REGRAS DE DADO E INTENÇÃO) ---
 ESTRUTURA_NARRATIVA = """
-DIRETRIZES DE MESTRE DE RPG (SISTEMA D20 RÍGIDO):
-
-VOCÊ É O MESTRE, NÃO O ESCRITOR.
-O JOGADOR DIZ A INTENÇÃO ("EU ATIRO"). O DADO DIZ O RESULTADO ("ACERTOU").
-
-REGRAS DE COMBATE E DADOS:
-1. **INTENÇÃO vs RESULTADO:** Se o jogador disser "Eu ataco" ou "Tento abrir", NUNCA narre o sucesso imediato.
-   - RESPOSTA CORRETA: "A porta parece trancada. Role um teste de Força (CD 15) para arrombar." ou "O guarda saca a espada. Role Iniciativa (d20)."
-2. **AGUARDE O DADO:** Só narre o resultado final (se matou, se abriu, se caiu) DEPOIS que o jogador enviar o valor do dado (ex: "Rolei 15").
-3. **NARRATIVA DINÂMICA:** Se o jogador rolar Sucesso, narre uma cena heroica. Se rolar Falha, narre uma complicação ou dano.
-
-CONSISTÊNCIA DE TEMA:
-- Respeite as leis da física e magia do tema escolhido. Sem pistolas laser na Idade Média.
-
-DIRETRIZES DE MESTRE DE RPG (SISTEMA D20 + INVENTÁRIO REAL):
+DIRETRIZES DE MESTRE DE RPG (SISTEMA D20 RÍGIDO + MATH):
 
 VOCÊ É O MESTRE. O JOGADOR É O HERÓI.
-O DADO DEFINE O SUCESSO. O INVENTÁRIO É REAL.
+VOCÊ NÃO TEM DADOS. VOCÊ CRIA DIFICULDADES (CD). SÓ O JOGADOR ROLA.
 
-REGRAS DE OURO:
-1. **DADOS:** Se houver risco, PEÇA UM TESTE (ex: "Role Força CD 12"). Só narre o sucesso após o jogador rolar.
-2. **INVENTÁRIO AUTOMÁTICO (IMPORTANTE):** - Se o jogador GANHAR um item, escreva no final: `[ADD: Nome do Item]`
-   - Se o jogador GASTAR/PERDER um item, escreva: `[REMOVE: Nome Exato do Item]`
-   - O código do jogo vai ler essas tags e atualizar a mochila do jogador. Não fale sobre "atualizar inventário" no texto, apenas use as tags.
+REGRAS ABSOLUTAS (ZERO AUTOMATISMO):
+1. **NUNCA ROLE PELO JOGADOR:** Jamais escreva `[Rolagem: X]` ou assuma que o jogador passou.
+   - ERRADO: "Você atira e acerta a criatura."
+   - CORRETO: "Você mira na criatura! Role Destreza (CD 12) para ver se acerta."
+2. **COMBATE (PLAYER FACING):**
+   - **JOGADOR ATACA:** Peça teste de Ataque (FOR/DES/INT).
+   - **MONSTRO ATACA:** Inimigos NÃO rolam. Narre o ataque mortal e obrigue o jogador a rolar DEFESA/ESQUIVA.
+     - Ex: "O monstro tenta te morder! Role Destreza (CD 14) para esquivar."
+3. **MATEMÁTICA DO DADO:**
+   - O jogador envia o valor BRUTO do dado (1-20).
+   - **SOME O BÔNUS MENTALMENTE:** 10-11(+0), 12-13(+1), 14-15(+2), 16-17(+3), 18-19(+4).
+   - Compare (Dado + Bônus) vs CD para narrar o sucesso ou falha.
+4. **INVENTÁRIO:**
+   - Ganhou item: `[ADD: Nome do Item]`
+   - Perdeu/Gastou: `[REMOVE: Nome do Item]`
 
 ESTRUTURA:
-- 4 Atos (10-15 turnos cada). Não escreva "Ato X" no texto.
+- Atos 1 a 4.
 
 FORMATO:
 - Máximo 2 parágrafos.
-- Termine SEMPRE com "O que você faz?" ou pedindo rolagem.
+- Termine SEMPRE perguntando a ação ou pedindo a rolagem.
 """
 
 PROMPT_MESTRE_BASE = f"""
@@ -138,10 +134,10 @@ def chat():
 
     # 2. INSTRUÇÃO EXTRA (Dados + Gestão de Itens)
     if "🎲" in msg_original or "Rolei" in msg_original:
-        instrucao = "[Mestre: O jogador rolou. Narre o resultado. Se ele gastou itens (poção, flecha), use as tags [REMOVE]/[ADD] para atualizar a mochila.]"
+        instrucao = "[Mestre: O jogador rolou. Verifique o número + bônus de atributo contra a CD. Narre o sucesso/falha com emoção. Se gastou itens, use [REMOVE].]"
     else:
-        instrucao = "[Mestre: O jogador declarou intenção. Peça teste se necessário. Se ele achar itens, use [ADD: Item].]"
-
+        instrucao = "[Mestre: O jogador declarou intenção. PARE. NÃO narre o resultado. PEÇA UM TESTE (CD X) e aguarde o dado.]"
+        
     msg_final = f"{info_personagem} \n JOGADOR: {msg_original} \n {instrucao}"
     
     historico_bruto = dados.get('history', []) 
