@@ -34,7 +34,7 @@ function App() {
   const [musicaLigada, setMusicaLigada] = useState(true);
   const [volMusica, setVolMusica] = useState(0.1);
 
-  // --- NOVO: ESTADOS DO INVENTÁRIO ---
+  // --- ESTADOS DO INVENTÁRIO ---
   const [invAberto, setInvAberto] = useState(false);
   const [ficha, setFicha] = useState({
     classe: '',
@@ -43,7 +43,6 @@ function App() {
   });
 
   const [mostrarCreditos, setMostrarCreditos] = useState(false);
-
   const [digitando, setDigitando] = useState(false);
 
   const MUSICAS = {
@@ -60,7 +59,7 @@ function App() {
     espacial: "🚀 **Sistemas de Suporte: Críticos.** Acorde, engenheiro. Eu sou a I.A. da nave USG Ishimura. Estamos à deriva e não estamos sozinhos..."
   };
 
-  // --- NOVO: LOADOUTS INICIAIS ---
+  // --- LOADOUTS INICIAIS ---
   const LOADOUTS = {
     medieval: {
       classe: "Guerreiro",
@@ -193,14 +192,49 @@ function App() {
     }, 1500);
   }
 
+  // --- NOVA FUNÇÃO (ADICIONADA): PROCESSADOR DE INVENTÁRIO ---
+  const processarComandosIA = (textoResposta) => {
+    let novoTexto = textoResposta;
+    let inventarioAtualizado = [...ficha.itens];
+    let houveMudanca = false;
+
+    // Adicionar Item [ADD: Item]
+    const regexAdd = /\[ADD:\s*(.*?)\]/g;
+    let matchAdd;
+    while ((matchAdd = regexAdd.exec(textoResposta)) !== null) {
+      const item = matchAdd[1].trim();
+      inventarioAtualizado.push(item);
+      novoTexto = novoTexto.replace(matchAdd[0], ''); 
+      houveMudanca = true;
+    }
+
+    // Remover Item [REMOVE: Item]
+    const regexRemove = /\[REMOVE:\s*(.*?)\]/g;
+    let matchRemove;
+    while ((matchRemove = regexRemove.exec(textoResposta)) !== null) {
+      const itemParaRemover = matchRemove[1].trim();
+      const index = inventarioAtualizado.indexOf(itemParaRemover);
+      if (index > -1) {
+        inventarioAtualizado.splice(index, 1);
+        houveMudanca = true;
+      }
+      novoTexto = novoTexto.replace(matchRemove[0], ''); 
+    }
+
+    if (houveMudanca) {
+      setFicha(prev => ({ ...prev, itens: inventarioAtualizado }));
+    }
+
+    return novoTexto.trim();
+  }
+
+  // --- FUNÇÃO AJUSTADA: AGORA ENVIA A FICHA ---
   const iniciarAventura = async (tema) => {
     setLoading(true); setMensagens([]); setJogoIniciado(true); setPodeContinuar(false);
     
-    // Configura a música
     setMusicaLigada(true); 
     tocarMusicaFundo(tema);
 
-    // CONFIGURA O INVENTÁRIO INICIAL
     const loadout = LOADOUTS[tema] || LOADOUTS['medieval'];
     setFicha(loadout);
 
@@ -210,8 +244,15 @@ function App() {
     falarTexto(introManual);
 
     try {
-      const response = await axios.post(`${API_URL}/api/reset`, { theme: tema });
-      setMensagens(prev => [...prev, { tipo: 'bot', text: response.data.reply }]);
+      // Envia charData para o backend
+      const response = await axios.post(`${API_URL}/api/reset`, { 
+        theme: tema,
+        charData: loadout
+      });
+      
+      // Processa se a IA mandou adicionar algo
+      const textoLimpo = processarComandosIA(response.data.reply);
+      setMensagens(prev => [...prev, { tipo: 'bot', text: textoLimpo }]);
     } catch (error) { 
       const msgErro = error.response?.data?.reply || "Erro ao conectar.";
       setMensagens(prev => [...prev, { tipo: 'bot', text: msgErro }]); 
@@ -232,18 +273,32 @@ function App() {
     finally { setLoading(false); }
   }
 
+  // --- FUNÇÃO AJUSTADA: ENVIA FICHA E PROCESSA ITENS ---
   const enviarMensagem = async (e, textoOpcional = null) => {
     if (e) e.preventDefault();
     const txt = textoOpcional || texto;
     if (!txt.trim()) return;
     pararFalar();
     const tipoMsg = txt.includes('🎲') ? 'system' : 'user';
-    setMensagens(prev => [...prev, { tipo: tipoMsg, text: txt }]);
+    
+    const novasMensagens = [...mensagens, { tipo: tipoMsg, text: txt }];
+    setMensagens(novasMensagens);
+    
     if (tipoMsg === 'user') setTexto('');
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/api/chat`, { message: txt });
+      // Envia charData e histórico
+      const response = await axios.post(`${API_URL}/api/chat`, { 
+        message: txt,
+        history: novasMensagens,
+        charData: ficha 
+      });
+
       let respostaIA = response.data.reply;
+      
+      // Processa tags [ADD]/[REMOVE] e limpa texto
+      respostaIA = processarComandosIA(respostaIA);
+
       if (respostaIA.includes('[FIM]')) {
         setPodeContinuar(true);
         respostaIA = respostaIA.replace('[FIM]', '');
@@ -259,7 +314,7 @@ function App() {
 
   const resetarJogoTotal = () => {
     setJogoIniciado(false);
-    setInvAberto(false); // Fecha o inventário ao sair
+    setInvAberto(false);
     pararFalar();
     pararMusicaTotal();
   }
@@ -267,12 +322,10 @@ function App() {
   if (!jogoIniciado) {
     return (
       <div className="container menu-screen">
-        {/* BOTÃO DE CRÉDITOS NO TOPO */}
         <button className="credits-btn" onClick={() => setMostrarCreditos(true)} title="Sobre o Criador">
           <Info size={32} />
         </button>
 
-        {/* MODAL DE CRÉDITOS */}
         {mostrarCreditos && (
           <div className="modal-overlay">
             <div className="credits-box">
@@ -305,19 +358,15 @@ function App() {
 
   return (
     <div className="container">
-      {/* REMOVIDO O BOTÃO FLUTUANTE DAQUI */}
 
-      {/* --- PAINEL LATERAL (DRAWER) --- (Continua igual) */}
       <div className={`inventory-panel ${invAberto ? 'open' : ''}`}>
         <div className="inventory-header">
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
              <h2>{ficha.classe}</h2>
-             {/* Botão X para fechar dentro do painel também */}
              <button onClick={() => setInvAberto(false)} className="btn-fechar-voz"><X size={24}/></button>
           </div>
         </div>
         
-        {/* Atributos (Continua igual) */}
         <div className="stats-grid">
           <div className="stat-row str">
             <span className="stat-name">FOR</span>
@@ -338,7 +387,6 @@ function App() {
 
         <hr style={{borderColor: 'rgba(255,255,255,0.1)', margin: '10px 0'}}/>
         
-        {/* Lista de Itens (Continua igual) */}
         <h3 style={{color: '#ffd700', fontFamily: 'Cinzel'}}>Mochila</h3>
         <ul className="items-list">
           {ficha.itens.map((item, i) => (
@@ -353,7 +401,6 @@ function App() {
       <div className="chat-box">
         <header>
           <h1>RPG Master 🎙️</h1>
-          {/* ... (Menu de voz continua igual) ... */}
           {mostrarConfig && (
             <div className="voz-selector">
               <div className="config-header">
@@ -376,9 +423,7 @@ function App() {
             </div>
           )}
           
-          {/* --- AQUI ESTÁ A MUDANÇA NO HEADER --- */}
           <div className="header-controls">
-            {/* Botão da Mochila agora é um btn-header normal */}
             <button onClick={() => setInvAberto(!invAberto)} className="btn-header" title="Inventário">
                <Backpack size={28}/>
             </button>
@@ -393,7 +438,6 @@ function App() {
           </div>
         </header>
 
-        {/* ... (Resto do chat e input continua igual) ... */}
         <div className="messages-area">
           {mensagens.map((msg, i) => (
             <div key={i} className={`message ${msg.tipo}`}>
@@ -409,7 +453,6 @@ function App() {
         </div>
         <div className="input-container">
           
-          {/* PAINEL DE DIGITAÇÃO (Sobe quando clica em Responder) */}
           <div className={`writing-panel ${digitando ? 'open' : ''}`}>
             <div className="writing-header">
               <span>Sua Ação</span>
