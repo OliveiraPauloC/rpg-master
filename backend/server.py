@@ -17,7 +17,7 @@ CHAVES = [
 ]
 CHAVES = [k for k in CHAVES if k] 
 
-# AUMENTADO PARA 4000 PARA EVITAR CORTES BRUSCOS
+# AUMENTADO PARA 4000 (EVITA CORTES)
 generation_config = {
     "temperature": 1.0,
     "max_output_tokens": 4000, 
@@ -30,7 +30,7 @@ MODELOS_PARA_TENTAR = [
     'gemini-pro-latest'          
 ]
 
-# --- PROMPT REFINADO (SEM CORTES BRUSCOS) ---
+# --- PROMPT MESTRE (VERSÃO NARRATIVA FLUÍDA) ---
 ESTRUTURA_NARRATIVA = """
 DIRETRIZES DE MESTRE DE RPG (SISTEMA D20):
 
@@ -39,16 +39,17 @@ FOCO: Ação, risco e testes de perícia.
 
 REGRAS DE OURO:
 1. PEÇA ROLAGENS: Se o jogador tentar algo arriscado, PEÇA UM TESTE (ex: "Faça um teste de Força CD 12").
-2. INTERPRETE OS DADOS: Se o jogador rolar o dado, narre o resultado.
-3. INIMIGOS AGRESSIVOS: Se o jogador hesitar, o inimigo ataca.
-4. LOOT: Dê recompensas após vitórias.
+2. PÓS-DADO (IMPORTANTE): Ao receber um resultado de dado, NÃO diga apenas "Sucesso". Descreva a cena heroica ou o desastre trágico. Dê vida ao resultado!
+3. CONTINUIDADE: Após narrar o resultado do dado, a cena DEVE continuar. O inimigo recua? A porta abre? O que acontece depois?
+4. FINALIZAÇÃO OBRIGATÓRIA: NUNCA termine uma resposta sem perguntar "O que você faz?" ou dar opções. O jogo não pode parar.
 
 ESTRUTURA (ATOS):
-- Use a estrutura de 4 Atos para guiar a dificuldade, mas NÃO escreva "ATO 1" ou "ATO 2" no texto para não quebrar a imersão.
+- Use a estrutura de 4 Atos para guiar a dificuldade, mas NÃO escreva "ATO 1" ou "ATO 2" no texto.
 
 FORMATO DA RESPOSTA:
-- Escreva parágrafos completos.
-- Termine sempre perguntando a ação OU pedindo uma rolagem.
+- Use parágrafos descritivos (2 a 3).
+- Se o jogador rolar 20 (Crítico), narre algo épico.
+- Se rolar 1 (Falha Crítica), narre um desastre divertido.
 """
 
 PROMPT_MESTRE_BASE = f"""
@@ -99,7 +100,7 @@ def gerar_resposta_blindada(prompt_usuario, historico_formatado):
             
             model = genai.GenerativeModel(nome_modelo, generation_config=generation_config)
             
-            # ENVIA TUDO SEM CORTES NO PYTHON
+            # REMOVIDO O SPLIT QUE CORTAVA O TEXTO
             response = model.generate_content(historico_formatado)
             texto_resposta = response.text
             
@@ -115,8 +116,8 @@ def gerar_resposta_blindada(prompt_usuario, historico_formatado):
 @app.route('/api/chat', methods=['POST'])
 def chat():
     dados = request.json
-    # Prompt reforçado
-    msg_usuario = f"{dados.get('message')} [Mestre: Se houver risco, PEÇA UM TESTE. Seja breve e termine a frase.]"
+    # Prompt reforçado na mensagem do usuário
+    msg_usuario = f"{dados.get('message')} [Mestre: Narre o resultado com detalhes. E termine perguntando: O que você faz?]"
     
     historico_bruto = dados.get('history', []) 
     historico_gemini = converter_historico_para_gemini(historico_bruto)
