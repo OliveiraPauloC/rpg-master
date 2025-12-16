@@ -17,7 +17,6 @@ CHAVES = [
 ]
 CHAVES = [k for k in CHAVES if k] # Remove vazias para não dar erro
 
-# 1000 tokens é muito mais que suficiente para 2 parágrafos (sobra muito espaço)
 generation_config = {
     "temperature": 1.0,
     "max_output_tokens": 1000, 
@@ -32,29 +31,40 @@ MODELOS_PARA_TENTAR = [
 
 historico_por_ip = {} 
 
-# --- PROMPT REFINADO (SEGURANÇA CONTRA TEXTÃO) ---
+# --- PROMPT REFINADO (CAMPANHA LONGA E RITMADA) ---
 ESTRUTURA_NARRATIVA = """
-DIRETRIZES DE MESTRE (RPG DE TEXTO MOBILE):
-1. **TAMANHO:** Responda SEMPRE em no máximo 2 parágrafos. Seja denso e atmosférico, mas breve. O jogador está no celular.
-2. **PAUSA:** NUNCA avance a história além da consequência imediata. Pare e espere a reação.
-3. **REGRA DE OURO:** NUNCA descreva as ações ou falas do personagem do jogador. Você controla o mundo, ele controla o herói.
-4. **FINALIZAÇÃO:** Termine o texto deixando claro que é a vez do jogador (ex: "O que você faz?", "A criatura avança, qual sua reação?").
-5. **ATOS:** O jogo deve ser lento. Não resolva o mistério no começo. Faça o jogador sofrer e lutar.
+DIRETRIZES DE MESTRE DE RPG (MODO CAMPANHA LONGA):
+
+OBJETIVO PRINCIPAL: Você deve mestrar uma campanha dividida em 4 ATOS.
+DURAÇÃO: Cada ato deve durar aproximadamente 10 a 15 interações. NÃO APRESSE A HISTÓRIA.
+
+ESTRUTURA INTERNA (USE PARA GUIAR A TRAMA, MAS NÃO FALE ISSO AO JOGADOR):
+- INÍCIO (Ato 1): Foco em mistério, ambientação e perigos menores. O jogador está descobrindo o local.
+- MEIO (Ato 2): A dificuldade aumenta. Inimigos mais fortes, recursos escassos, reviravoltas na trama.
+- CLÍMAX (Ato 3): O confronto com o grande mal ou o desafio final. Só deve acontecer após muitas rodadas.
+- DESFECHO (Ato 4): A resolução e as consequências.
+
+REGRAS DE OURO (SEGURANÇA):
+1. PAUSA OBRIGATÓRIA: Narre APENAS a consequência imediata da ação do jogador (ex: ele abriu a porta -> descreva o que tem dentro). PARE IMEDIATAMENTE.
+2. NUNCA JOGUE PELO JOGADOR: Jamais descreva o que o personagem do jogador fala, pensa ou decide.
+3. SEM SPOILERS: Nunca narre o "Ato 2" ou "Ato 3" na mesma mensagem. Viva o momento presente.
+4. TAMANHO: Máximo 2 parágrafos por resposta.
+5. FINALIZAÇÃO: Sempre termine devolvendo a ação ao jogador (ex: "O que você faz?", "A criatura te encara, qual sua reação?").
 """
 
 PROMPT_MESTRE_BASE = f"""
 {ESTRUTURA_NARRATIVA}
 PERSONALIDADE: Narrativo, Sombrio, Imersivo (Dark Fantasy/Sci-Fi).
-REGRAS TÉCNICAS:
-- Use **Negrito** para itens, nomes e perigos.
-- Use *Itálico* para sons e sussurros.
+TÉCNICA:
+- Use **Negrito** para itens, nomes importantes e inimigos.
+- Use *Itálico* para sons, cheiros e sensações.
 """
 
 TEMAS = {
-    "medieval": f"{PROMPT_MESTRE_BASE} CENÁRIO: Dark Fantasy (Estilo Dark Souls). PROTAGONISTA: Guerreiro.",
-    "cyberpunk": f"{PROMPT_MESTRE_BASE} CENÁRIO: Cyberpunk Distópico. PROTAGONISTA: Mercenário.",
-    "terror": f"{PROMPT_MESTRE_BASE} CENÁRIO: Terror Lovecraftiano Anos 20. PROTAGONISTA: Investigador.",
-    "espacial": f"{PROMPT_MESTRE_BASE} CENÁRIO: Horror Espacial (Estilo Dead Space). PROTAGONISTA: Engenheiro."
+    "medieval": f"{PROMPT_MESTRE_BASE} CENÁRIO: Alta Fantasia Épica (Estilo Dungeons & Dragons e Senhor dos Anéis). Um mundo vasto de magia antiga, raças diversas (humanos, elfos, anões), reinos grandiosos e heróis lendários enfrentando o mal absoluto.",
+    "cyberpunk": f"{PROMPT_MESTRE_BASE} CENÁRIO: Cyberpunk Distópico. Alta tecnologia, baixa vida, corporações cruéis.",
+    "terror": f"{PROMPT_MESTRE_BASE} CENÁRIO: Terror Lovecraftiano. Mistério investigativo, sanidade frágil, horror cósmico.",
+    "espacial": f"{PROMPT_MESTRE_BASE} CENÁRIO: Horror Espacial (Estilo Dead Space/Alien). Claustrofobia, naves abandonadas, silêncio."
 }
 
 app = Flask(__name__)
@@ -69,27 +79,32 @@ def gerar_resposta_blindada(prompt_usuario, historico):
             # Sorteia uma chave se houver lista, senão tenta pegar a única que tiver
             chave_escolhida = random.choice(CHAVES) if CHAVES else os.getenv("GEMINI_API_KEY")
             
-            # Se não tiver nenhuma chave configurada, vai dar erro aqui
             if not chave_escolhida: raise Exception("Nenhuma chave de API encontrada!")
 
             genai.configure(api_key=chave_escolhida)
             
-            print(f"--> Jogando no {nome_modelo}...") # Log para você ver no Render
+            print(f"--> Jogando no {nome_modelo}...") 
             model = genai.GenerativeModel(nome_modelo, generation_config=generation_config)
             
             response = model.generate_content(historico)
             texto_resposta = response.text
             
+            # --- TRAVA DE SEGURANÇA EXTRA ---
+            # Se a IA tentar escrever um roteiro (Ato 1, Ato 2...), cortamos o texto.
+            if "ATO 2" in texto_resposta or "ATO 3" in texto_resposta:
+                 print("⚠️ A IA tentou avançar demais. Cortando resposta.")
+                 # Tenta pegar só o primeiro parágrafo se ela surtar
+                 texto_resposta = texto_resposta.split("ATO 2")[0]
+
             # Se deu certo, salva a resposta na memória e retorna
             historico.append({"role": "model", "parts": [texto_resposta]})
             return texto_resposta, 200
             
         except Exception as e:
             print(f"❌ Erro no {nome_modelo}: {e}")
-            time.sleep(0.5) # Espera um pouquinho antes de tentar o próximo
+            time.sleep(0.5) 
             continue
 
-    # Se saiu do loop, tudo falhou
     return "⚠️ **O Mestre precisa de um descanso.**<br>Muitos jogadores ao mesmo tempo. Aguarde 10 segundos e tente de novo.", 429
 
 @app.route('/api/chat', methods=['POST'])
@@ -98,8 +113,8 @@ def chat():
     if user_ip not in historico_por_ip: historico_por_ip[user_ip] = []
     
     dados = request.json
-    # O sufixo força a IA a lembrar que deve parar de falar
-    msg_usuario = f"{dados.get('message')} [Responda em 2 parágrafos e PARE]"
+    # O sufixo reforça a regra a cada turno
+    msg_usuario = f"{dados.get('message')} [Mestre: Responda apenas a consequência IMEDIATA dessa ação. Não avance a trama. Máximo 2 parágrafos. Espere minha próxima ação.]"
     
     texto, status = gerar_resposta_blindada(msg_usuario, historico_por_ip[user_ip])
     return jsonify({"reply": texto}), status
@@ -112,13 +127,13 @@ def reset_game():
     tema = request.json.get('theme', 'medieval')
     prompt_completo = TEMAS.get(tema, TEMAS['medieval'])
     
-    # Prompt inicial ultra-específico para não começar narrando a vida toda
+    # Prompt inicial focado APENAS NA INTRODUÇÃO
     comando_inicial = f"""
     SISTEMA: {prompt_completo}
-    AÇÃO IMEDIATA: Introduza APENAS a cena inicial.
-    Descreva onde o personagem acorda/está e qual o perigo ou mistério visível.
-    NÃO faça o personagem andar nem falar nada.
-    Termine perguntando o que ele faz.
+    INÍCIO DO JOGO (ATO 1 - CENA 1):
+    Descreva onde o personagem está agora. Descreva o ambiente, o cheiro e um mistério inicial ou perigo imediato à frente.
+    NÃO resolva nada. NÃO mova o personagem.
+    Termine perguntando: "O que você faz?"
     """
     
     texto, status = gerar_resposta_blindada(comando_inicial, historico_por_ip[user_ip])
@@ -129,11 +144,11 @@ def continue_game():
     user_ip = request.remote_addr
     hist = historico_por_ip.get(user_ip, [])
     
-    resumo, status = gerar_resposta_blindada("Resuma os feitos do personagem em 1 parágrafo para a próxima aventura.", hist)
+    resumo, status = gerar_resposta_blindada("Resuma os eventos até agora em 1 parágrafo curto.", hist)
     if status != 200: return jsonify({"reply": resumo}), status
     
     historico_por_ip[user_ip] = [] 
-    prompt_novo = f"{PROMPT_MESTRE_BASE} \n NOVA TEMPORADA INICIADA. VETERANO: {resumo} \n AÇÃO: Comece uma nova situação de perigo. Seja breve."
+    prompt_novo = f"{PROMPT_MESTRE_BASE} \n MUDANÇA DE CAPÍTULO. Histórico anterior: {resumo} \n AÇÃO: Inicie uma nova ameaça ou reviravolta na trama agora. Seja breve."
     
     texto, status = gerar_resposta_blindada(prompt_novo, historico_por_ip[user_ip])
     return jsonify({"reply": texto}), status
